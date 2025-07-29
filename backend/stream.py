@@ -1,30 +1,28 @@
 from flask import Flask, render_template, Response
 import cv2
+import os
 
-app = Flask(__name__, template_folder='../frontend/templates')
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'templates'))
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static'))
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
 camera = cv2.VideoCapture(0)
 
 def generate_frames():
-    try:
-        while True:
-            success, frame = camera.read()
-            if not success:
-                break
-            else:
-                # ELECTRODE DETECTION LOGIC
-                # frame = detect_electrodes(frame)
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        else:
+            # ELECTRODE DETECTION LOGIC
+            # frame = detect_electrodes(frame)
 
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
 
-                # Send stream of images/frames, stream of bytes (b)
-                yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-                
-    except GeneratorExit:
-        print("Client left")
-    finally:
-        camera.release()
+            # Send stream of images/frames, stream of bytes (b)
+            yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/')
 def index():
