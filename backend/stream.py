@@ -9,14 +9,14 @@ app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
 camera = cv2.VideoCapture(0)
 
+# Treating the live video feed as a stream of images
 def generate_frames():
     while True:
         success, frame = camera.read()
         if not success:
             break
         else:
-            # ELECTRODE DETECTION LOGIC
-            # frame = detect_electrodes(frame)
+            # ELECTRODE DETECTION LOGIC?
 
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
